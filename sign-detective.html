@@ -1,0 +1,754 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Detective | Integer Multiplication</title>
+
+  <style>
+    :root {
+      --navy: #0B1F3A;
+      --yellow: #FFD23F;
+      --coral: #FF6B6B;
+      --green: #38D996;
+      --white: #F7F9FC;
+      --card: #142C4B;
+      --muted: #AFC2D9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      background: var(--navy);
+      color: var(--white);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 15px;
+      padding: 15px 20px;
+      font-weight: 800;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mascot {
+      font-size: 48px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      color: var(--yellow);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .score-card {
+      background: var(--card);
+      border: 1px solid #294463;
+      border-radius: 18px;
+      padding: 15px 22px;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .score-number {
+      color: var(--yellow);
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid #294463;
+      border-radius: 24px;
+      padding: 25px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .progress-track {
+      height: 11px;
+      border-radius: 20px;
+      background: #07172B;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--yellow);
+      border-radius: 20px;
+      transition: width 0.3s;
+    }
+
+    .question-label {
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .equation {
+      text-align: center;
+      font-size: clamp(42px, 7vw, 64px);
+      font-weight: 900;
+      margin: 14px 0 24px;
+      letter-spacing: 1px;
+    }
+
+    .positive {
+      color: var(--yellow);
+    }
+
+    .negative {
+      color: var(--coral);
+    }
+
+    .prompt {
+      font-size: 19px;
+      font-weight: 800;
+      text-align: center;
+      margin: 20px 0 15px;
+    }
+
+    .sign-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .positive-btn {
+      background: var(--yellow);
+      color: var(--navy);
+    }
+
+    .negative-btn {
+      background: var(--coral);
+      color: #27101A;
+    }
+
+    .selected {
+      outline: 3px solid white;
+      outline-offset: 3px;
+    }
+
+    .answer-area {
+      margin-top: 26px;
+      padding-top: 22px;
+      border-top: 1px solid #34506D;
+    }
+
+    .answer-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .answer-input {
+      min-width: 0;
+      width: 100%;
+      background: #081A30;
+      color: white;
+      border: 2px solid #45617E;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+      outline: none;
+    }
+
+    .answer-input:focus {
+      border-color: var(--yellow);
+    }
+
+    .check-btn {
+      background: var(--yellow);
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      line-height: 1.5;
+      font-weight: 700;
+      display: none;
+    }
+
+    .feedback.success {
+      display: block;
+      color: #A8FFD9;
+      background: #103D37;
+      border: 1px solid var(--green);
+    }
+
+    .feedback.error {
+      display: block;
+      color: #FFE0DF;
+      background: #482832;
+      border: 1px solid var(--coral);
+    }
+
+    .feedback.info {
+      display: block;
+      color: #FFF0A6;
+      background: #40371B;
+      border: 1px solid var(--yellow);
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .next-btn {
+      background: var(--green);
+      color: #062A21;
+      flex: 1;
+    }
+
+    .restart-btn {
+      background: transparent;
+      border: 2px solid #66809C;
+      color: var(--white);
+    }
+
+    .rules-title {
+      font-size: 22px;
+      margin: 0 0 8px;
+    }
+
+    .rules-intro {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 20px;
+    }
+
+    .rule {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: #0B1F3A;
+      padding: 16px;
+      border-radius: 14px;
+      margin-top: 11px;
+    }
+
+    .rule-expression {
+      font-size: 22px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .rule-meaning {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .rule-symbol {
+      color: var(--yellow);
+    }
+
+    .rule-result {
+      color: var(--green);
+    }
+
+    .detective-tip {
+      margin-top: 22px;
+      border-left: 4px solid var(--yellow);
+      padding: 12px 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      background: #102541;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .final-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0 5px;
+    }
+
+    .trophy {
+      font-size: 75px;
+      margin-bottom: 10px;
+    }
+
+    .final-screen h2 {
+      color: var(--yellow);
+      font-size: 32px;
+    }
+
+    .final-score {
+      font-size: 24px;
+      margin: 18px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 16px;
+      background: #103D37;
+      color: #A8FFD9;
+      font-size: 21px;
+      font-weight: 900;
+      margin: 10px 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 15px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 19px;
+      }
+
+      .answer-row {
+        flex-direction: column;
+      }
+
+      .check-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="mascot">🕵️</div>
+        <div>
+          <h1>Sign Detective</h1>
+          <div class="subtitle">Integer Multiplication Challenge · Grade 7</div>
+        </div>
+      </div>
+
+      <div class="score-card">
+        <div>YOUR SCORE</div>
+        <div class="score-number"><span id="score">0</span>/<span id="total">6</span></div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <main class="panel">
+        <div id="game">
+          <div class="progress-top">
+            <span id="caseNumber">Case 1 of 6</span>
+            <span id="progressText">0% complete</span>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+
+          <div class="question-label">SOLVE THE CASE</div>
+          <div class="equation" id="equation"></div>
+
+          <div class="prompt">Step 1: Detect the sign of the answer!</div>
+
+          <div class="sign-buttons">
+            <button class="positive-btn" id="positiveBtn"
+              onclick="chooseSign('positive')">
+              Positive (+)
+            </button>
+
+            <button class="negative-btn" id="negativeBtn"
+              onclick="chooseSign('negative')">
+              Negative (−)
+            </button>
+          </div>
+
+          <div class="answer-area">
+            <div class="prompt">Step 2: Enter the full answer</div>
+
+            <div class="answer-row">
+              <input
+                id="answerInput"
+                class="answer-input"
+                type="number"
+                step="1"
+                placeholder="Your answer"
+                aria-label="Enter your integer answer"
+              >
+              <button class="check-btn" id="checkBtn" onclick="checkAnswer()">
+                Check
+              </button>
+            </div>
+          </div>
+
+          <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+
+          <div class="navigation">
+            <button class="restart-btn" onclick="restartGame()">↻ Restart</button>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>
+              Next →
+            </button>
+          </div>
+        </div>
+
+        <div class="final-screen" id="finalScreen">
+          <div class="trophy" id="finalTrophy">🏆</div>
+          <h2>Case Files Completed!</h2>
+          <p id="finalMessage">You finished all six cases.</p>
+          <div class="final-score" id="finalScore"></div>
+          <div class="badge" id="finalBadge"></div>
+          <p id="finalTip"></p>
+          <button class="positive-btn" onclick="restartGame()">Play Again ↻</button>
+        </div>
+      </main>
+
+      <aside class="panel">
+        <h2 class="rules-title">📘 The 4 Sign Rules</h2>
+        <p class="rules-intro">
+          Remember these rules to crack every multiplication case!
+        </p>
+
+        <div class="rule">
+          <div class="rule-expression">
+            <span class="positive">+</span> × <span class="positive">+</span>
+            = <span class="rule-result">+</span>
+          </div>
+          <div class="rule-meaning">Same signs<br>Positive answer</div>
+        </div>
+
+        <div class="rule">
+          <div class="rule-expression">
+            <span class="negative">−</span> × <span class="negative">−</span>
+            = <span class="rule-result">+</span>
+          </div>
+          <div class="rule-meaning">Same signs<br>Positive answer</div>
+        </div>
+
+        <div class="rule">
+          <div class="rule-expression">
+            <span class="positive">+</span> × <span class="negative">−</span>
+            = <span class="negative">−</span>
+          </div>
+          <div class="rule-meaning">Different signs<br>Negative answer</div>
+        </div>
+
+        <div class="rule">
+          <div class="rule-expression">
+            <span class="negative">−</span> × <span class="positive">+</span>
+            = <span class="negative">−</span>
+          </div>
+          <div class="rule-meaning">Different signs<br>Negative answer</div>
+        </div>
+
+        <div class="detective-tip">
+          <strong>🕵️ Detective tip:</strong><br>
+          First check whether the signs match. Then multiply the numbers and
+          attach the correct sign!
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      Think carefully. Find the sign. Crack the case!
+    </footer>
+  </div>
+
+  <script>
+    // EDITABLE QUESTION ARRAY: Add, remove, or change questions here.
+    const questions = [
+      { a: -4,  b:  2, answer: -8 },
+      { a: -3,  b: -6, answer: 18 },
+      { a:  5,  b: -7, answer: -35 },
+      { a: -8,  b: -2, answer: 16 },
+      { a:  9,  b: -1, answer: -9 },
+      { a: -10, b:  3, answer: -30 }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let selectedSign = null;
+    let solved = false;
+
+    const $ = (id) => document.getElementById(id);
+
+    function formatNumber(number) {
+      return number < 0 ? "−" + Math.abs(number) : String(number);
+    }
+
+    function signOf(number) {
+      return number >= 0 ? "positive" : "negative";
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+
+      selectedSign = null;
+      solved = false;
+
+      $("game").classList.remove("hidden");
+      $("finalScreen").style.display = "none";
+
+      $("caseNumber").textContent =
+        `Case ${current + 1} of ${questions.length}`;
+
+      $("progressText").textContent =
+        `${Math.round((current / questions.length) * 100)}% complete`;
+
+      $("progressFill").style.width =
+        `${(current / questions.length) * 100}%`;
+
+      $("score").textContent = score;
+      $("total").textContent = questions.length;
+
+      $("equation").innerHTML =
+        `<span class="${signOf(q.a)}">${formatNumber(q.a)}</span>
+         ×
+         <span class="${signOf(q.b)}">${formatNumber(q.b)}</span>
+         = <span class="positive">?</span>`;
+
+      $("positiveBtn").disabled = false;
+      $("negativeBtn").disabled = false;
+      $("positiveBtn").classList.remove("selected");
+      $("negativeBtn").classList.remove("selected");
+
+      $("answerInput").value = "";
+      $("answerInput").disabled = false;
+      $("checkBtn").disabled = false;
+      $("nextBtn").disabled = true;
+
+      $("feedback").className = "feedback";
+      $("feedback").textContent = "";
+    }
+
+    function showFeedback(message, type) {
+      $("feedback").textContent = message;
+      $("feedback").className = `feedback ${type}`;
+    }
+
+    // STEP 1: Check the student's selected sign.
+    function chooseSign(sign) {
+      if (solved) return;
+
+      selectedSign = sign;
+
+      $("positiveBtn").classList.toggle("selected", sign === "positive");
+      $("negativeBtn").classList.toggle("selected", sign === "negative");
+
+      const correctSign = signOf(questions[current].answer);
+
+      if (sign === correctSign) {
+        showFeedback("Correct sign! Now enter the full answer.", "success");
+        $("answerInput").focus();
+      } else {
+        showFeedback(
+          "Not quite! Same signs → positive, different signs → negative. Try the sign again.",
+          "error"
+        );
+      }
+    }
+
+    // STEP 2: Check the complete integer answer.
+    function checkAnswer() {
+      if (solved) return;
+
+      if (!selectedSign) {
+        showFeedback("Choose Positive (+) or Negative (−) first!", "info");
+        return;
+      }
+
+      const q = questions[current];
+      const correctSign = signOf(q.answer);
+      const rawAnswer = $("answerInput").value.trim();
+
+      if (selectedSign !== correctSign) {
+        showFeedback(
+          "Your sign choice is incorrect. Same signs → positive, different signs → negative. Try again!",
+          "error"
+        );
+        return;
+      }
+
+      if (rawAnswer === "") {
+        showFeedback("Type the full answer before clicking Check.", "info");
+        return;
+      }
+
+      const userAnswer = Number(rawAnswer);
+
+      if (!Number.isFinite(userAnswer) || !Number.isInteger(userAnswer)) {
+        showFeedback("Enter a whole integer, such as −8 or 18.", "error");
+        return;
+      }
+
+      if (userAnswer === q.answer) {
+        solved = true;
+        score++;
+
+        showFeedback("Detective solved it! 🔍🎉 +1 point!", "success");
+
+        $("score").textContent = score;
+        $("equation").innerHTML =
+          `${formatNumber(q.a)} × ${formatNumber(q.b)} =
+          <span style="color: var(--green)">${formatNumber(q.answer)}</span>`;
+
+        $("positiveBtn").disabled = true;
+        $("negativeBtn").disabled = true;
+        $("answerInput").disabled = true;
+        $("checkBtn").disabled = true;
+        $("nextBtn").disabled = false;
+        $("nextBtn").textContent =
+          current === questions.length - 1 ? "See Results 🏆" : "Next →";
+
+        $("progressText").textContent =
+          `${Math.round(((current + 1) / questions.length) * 100)}% complete`;
+
+        $("progressFill").style.width =
+          `${((current + 1) / questions.length) * 100}%`;
+      } else {
+        showFeedback(
+          "Not quite! Same signs → positive, different signs → negative. Check your multiplication and try again.",
+          "error"
+        );
+        $("answerInput").focus();
+        $("answerInput").select();
+      }
+    }
+
+    function nextQuestion() {
+      if (!solved) return;
+
+      current++;
+
+      if (current >= questions.length) {
+        showFinalResults();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showFinalResults() {
+      $("game").classList.add("hidden");
+      $("finalScreen").style.display = "block";
+
+      $("progressText").textContent = "100% complete";
+      $("progressFill").style.width = "100%";
+
+      $("finalScore").textContent =
+        `Your score: ${score} / ${questions.length}`;
+
+      if (score >= 5) {
+        $("finalTrophy").textContent = "🏆";
+        $("finalBadge").textContent = "Integer Master 🏆";
+        $("finalTip").textContent =
+          "Excellent detective work! You understand integer multiplication signs.";
+      } else if (score >= 3) {
+        $("finalTrophy").textContent = "⭐";
+        $("finalBadge").textContent = "Rising Star ⭐";
+        $("finalTip").textContent =
+          "Good progress! Keep practising the sign rules to improve your score.";
+      } else {
+        $("finalTrophy").textContent = "💪";
+        $("finalBadge").textContent = "Keep Practising 💪";
+        $("finalTip").textContent =
+          "Keep going! Review the four sign rules and try the cases again.";
+      }
+    }
+
+    function restartGame() {
+      current = 0;
+      score = 0;
+      selectedSign = null;
+      solved = false;
+      renderQuestion();
+    }
+
+    // Allow the Enter key to check the answer.
+    $("answerInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    // Start the game.
+    renderQuestion();
+  </script>
+</body>
+</html>
